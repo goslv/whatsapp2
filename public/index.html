@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💬 Whatsapp 2</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Pantalla de inicio -->
+<div id="inicio" class="pantalla-inicio">
+    <div class="container-inicio">
+        <h1>💬 Whatsapp 2</h1>
+        <p>Chat en tiempo real</p>
+        <input type="text" id="nombre-input" placeholder="Tu nombre" maxlength="20">
+        <button id="btn-unirse">Entrar</button>
+    </div>
+</div>
+
+<!-- Pantalla de chat -->
+<div id="chat" class="pantalla-chat" style="display: none;">
+    <div class="header">
+        <h2>💬 Whatsapp 2</h2>
+        <span id="usuario-nombre"></span>
+    </div>
+
+    <div id="mensajes" class="mensajes"></div>
+
+    <div class="input-area">
+        <input type="text" id="mensaje-input" placeholder="Escribe un mensaje...">
+        <button id="btn-enviar">Enviar</button>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
