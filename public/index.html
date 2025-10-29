@@ -1,68 +1,159 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💬 Whatsapp 2</title>
+    <title>Whatsapp 2 - Chat en Tiempo Real</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
-<!-- Pantalla de inicio -->
-<div id="inicio" class="pantalla-inicio">
-    <div class="container-inicio">
-        <h1>Whatsapp 2</h1>
-        <p>Chat en tiempo real</p>
-        <input type="text" id="nombre-input" placeholder="Tu nombre" maxlength="20">
-        <button id="btn-unirse">Entrar</button>
+    <!-- Pantalla de inicio -->
+    <div id="inicio" class="pantalla-inicio">
+        <div class="container-inicio">
+            <div class="logo-container">
+                <h1>Whatsapp 2</h1>
+            </div>
+            <p class="subtitle">Conéctate y chatea en tiempo real</p>
+
+            <form id="form-registro">
+                <!-- Nombre completo -->
+                <div class="input-group">
+                    <label for="nombre-completo">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        Nombre completo
+                    </label>
+                    <input type="text" id="nombre-completo" placeholder="Ej: Juan Pérez" maxlength="40" required>
+                </div>
+
+                <!-- Número de teléfono -->
+                <div class="input-group">
+                    <label for="telefono">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                            </path>
+                        </svg>
+                        Número de teléfono
+                    </label>
+                    <div class="telefono-container">
+                        <select id="prefijo" class="prefijo-select">
+                            <option value="+595" data-flag="🇵🇾">🇵🇾 +595</option>
+                            <option value="+54" data-flag="🇦🇷">🇦🇷 +54</option>
+                            <option value="+55" data-flag="🇧🇷">🇧🇷 +55</option>
+                            <option value="+56" data-flag="🇨🇱">🇨🇱 +56</option>
+                            <option value="+57" data-flag="🇨🇴">🇨🇴 +57</option>
+                            <option value="+52" data-flag="🇲🇽">🇲🇽 +52</option>
+                            <option value="+51" data-flag="🇵🇪">🇵🇪 +51</option>
+                            <option value="+598" data-flag="🇺🇾">🇺🇾 +598</option>
+                            <option value="+58" data-flag="🇻🇪">🇻🇪 +58</option>
+                            <option value="+34" data-flag="🇪🇸">🇪🇸 +34</option>
+                            <option value="+1" data-flag="🇺🇸">🇺🇸 +1</option>
+                        </select>
+                        <input type="tel" id="telefono" placeholder="981234567" maxlength="15" required>
+                    </div>
+                </div>
+
+                <!-- Username -->
+                <div class="input-group">
+                    <label for="username">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="8.5" cy="7" r="4"></circle>
+                            <polyline points="17 11 19 13 23 9"></polyline>
+                        </svg>
+                        Nombre de usuario
+                    </label>
+                    <input type="text" id="username" placeholder="juanperez" maxlength="20" required>
+                </div>
+
+                <button type="submit" id="btn-unirse">
+                    <span>Entrar al chat</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </form>
+        </div>
     </div>
-</div>
 
-<!-- Pantalla de chat -->
-<div id="chat" class="pantalla-chat" style="display: none;">
+    <!-- Pantalla de chat -->
+    <div id="chat" class="pantalla-chat" style="display: none;">
 
-    <!-- Sidebar con usuarios conectados -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h3>👥 Online</h3>
-        </div>
-        <div id="lista-usuarios" class="lista-usuarios">
-            <!-- Usuarios aparecerán aquí -->
-        </div>
-    </aside>
-
-    <!-- Área principal del chat -->
-    <main class="chat-principal">
-        <div class="header">
-            <div class="header-info">
-                <h2>Whatsapp 2</h2>
-                <span class="estado">En línea</span>
+        <!-- Sidebar con usuarios conectados -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    <h3>Usuarios Online</h3>
+                </div>
+                <span id="contador-usuarios" class="contador-usuarios">0</span>
             </div>
-            <div class="header-usuario">
-                <span id="usuario-nombre"></span>
+            <div id="lista-usuarios" class="lista-usuarios">
+                <!-- Usuarios aparecerán aquí -->
             </div>
-        </div>
+        </aside>
 
-        <div id="mensajes" class="mensajes"></div>
+        <!-- Área principal del chat -->
+        <main class="chat-principal">
+            <div class="header">
+                <div class="header-info">
+                    <h2>💬</h2>
+                </div>
+                <div class="header-usuario">
+                    <div class="perfil-usuario">
+                        <div class="avatar-header" id="avatar-header"></div>
+                        <div class="usuario-info-header">
+                            <span id="usuario-nombre"></span>
+                            <small id="usuario-telefono-header"></small>
+                            <span class="estado">
+                                <span class="status-dot"></span>
+                                En línea
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <!-- Indicador de "escribiendo..." -->
-        <div id="escribiendo-indicador" class="escribiendo-indicador" style="display: none;">
-            <span></span>
-        </div>
+            <div id="mensajes" class="mensajes"></div>
 
-        <div class="input-area">
-            <button class="btn-emoji" title="Emojis">😊</button>
-            <input type="text" id="mensaje-input" placeholder="Escribe un mensaje...">
-            <button id="btn-enviar">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/>
-                </svg>
-            </button>
-        </div>
-    </main>
-</div>
+            <!-- Indicador de "escribiendo..." -->
+            <div id="escribiendo-indicador" class="escribiendo-indicador" style="display: none;">
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <span class="typing-text"></span>
+            </div>
 
-<script src="/socket.io/socket.io.js"></script>
-<script src="app.js"></script>
+            <div class="input-area">
+                <input type="text" id="mensaje-input" placeholder="Escribe un mensaje..." maxlength="1000">
+                <button id="btn-enviar" title="Enviar mensaje">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor" />
+                    </svg>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
 </body>
+
 </html>

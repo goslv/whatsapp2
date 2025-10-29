@@ -3,41 +3,126 @@ const socket = io();
 // Elementos del DOM
 const pantallaInicio = document.getElementById('inicio');
 const pantallaChat = document.getElementById('chat');
-const nombreInput = document.getElementById('nombre-input');
-const btnUnirse = document.getElementById('btn-unirse');
+const formRegistro = document.getElementById('form-registro');
+const nombreCompletoInput = document.getElementById('nombre-completo');
+const prefijoSelect = document.getElementById('prefijo');
+const telefonoInput = document.getElementById('telefono');
+const usernameInput = document.getElementById('username');
 const mensajeInput = document.getElementById('mensaje-input');
 const btnEnviar = document.getElementById('btn-enviar');
 const mensajesDiv = document.getElementById('mensajes');
 const usuarioNombre = document.getElementById('usuario-nombre');
+const avatarHeader = document.getElementById('avatar-header');
 const listaUsuarios = document.getElementById('lista-usuarios');
+const contadorUsuarios = document.getElementById('contador-usuarios');
 const escribiendoIndicador = document.getElementById('escribiendo-indicador');
 
-let miNombre = '';
+let misDatos = {
+    nombreCompleto: '',
+    telefono: '',
+    username: ''
+};
 let escribiendoTimeout;
 
-// Función: Unirse al chat
-function unirseAlChat() {
-    const nombre = nombreInput.value.trim();
+// Función: Obtener iniciales del nombre
+function obtenerIniciales(nombre) {
+    const palabras = nombre.trim().split(' ');
+    if (palabras.length >= 2) {
+        return (palabras[0][0] + palabras[1][0]).toUpperCase();
+    }
+    return nombre.substring(0, 2).toUpperCase();
+}
 
-    if (nombre === '') {
-        alert('Por favor ingresa tu nombre');
+// Función: Validar username (solo letras, números y guiones bajos)
+function validarUsername(username) {
+    const regex = /^[a-zA-Z0-9_]+$/;
+    return regex.test(username);
+}
+
+// Función: Validar teléfono (solo números)
+function validarTelefono(telefono) {
+    const regex = /^[0-9]+$/;
+    return regex.test(telefono);
+}
+
+// Función: Unirse al chat
+function unirseAlChat(e) {
+    e.preventDefault();
+
+    const nombreCompleto = nombreCompletoInput.value.trim();
+    const prefijo = prefijoSelect.value;
+    const telefono = telefonoInput.value.trim();
+    const username = usernameInput.value.trim().toLowerCase();
+
+    // Validaciones
+    if (nombreCompleto === '') {
+        alert('Por favor ingresa tu nombre completo');
+        nombreCompletoInput.focus();
         return;
     }
 
-    miNombre = nombre;
+    if (nombreCompleto.length < 3) {
+        alert('El nombre debe tener al menos 3 caracteres');
+        nombreCompletoInput.focus();
+        return;
+    }
+
+    if (telefono === '') {
+        alert('Por favor ingresa tu número de teléfono');
+        telefonoInput.focus();
+        return;
+    }
+
+    if (!validarTelefono(telefono)) {
+        alert('El teléfono solo debe contener números');
+        telefonoInput.focus();
+        return;
+    }
+
+    if (telefono.length < 6) {
+        alert('El número de teléfono es muy corto');
+        telefonoInput.focus();
+        return;
+    }
+
+    if (username === '') {
+        alert('Por favor ingresa tu nombre de usuario');
+        usernameInput.focus();
+        return;
+    }
+
+    if (username.length < 3) {
+        alert('El username debe tener al menos 3 caracteres');
+        usernameInput.focus();
+        return;
+    }
+
+    if (!validarUsername(username)) {
+        alert('El username solo puede contener letras, números y guiones bajos');
+        usernameInput.focus();
+        return;
+    }
+
+    // Guardar datos del usuario
+    misDatos = {
+        nombreCompleto: nombreCompleto,
+        telefono: prefijo + telefono,
+        username: username
+    };
 
     // Cambiar pantallas
     pantallaInicio.style.display = 'none';
     pantallaChat.style.display = 'grid';
 
-    // Mostrar nombre en header
-    usuarioNombre.textContent = nombre;
+    // Mostrar datos en header
+    usuarioNombre.textContent = username;
+    avatarHeader.textContent = obtenerIniciales(nombreCompleto);
 
     // Enfocar input de mensaje
     mensajeInput.focus();
 
     // Enviar al servidor
-    socket.emit('unirse', nombre);
+    socket.emit('unirse', misDatos);
 }
 
 // Función: Enviar mensaje
@@ -47,7 +132,8 @@ function enviarMensaje() {
     if (mensaje === '') return;
 
     const data = {
-        usuario: miNombre,
+        usuario: misDatos.username,
+        nombreCompleto: misDatos.nombreCompleto,
         mensaje: mensaje,
         hora: obtenerHora()
     };
@@ -115,6 +201,7 @@ function obtenerHora() {
 // Función: Actualizar lista de usuarios
 function actualizarListaUsuarios(usuarios) {
     listaUsuarios.innerHTML = '';
+    contadorUsuarios.textContent = usuarios.length;
 
     usuarios.forEach(usuario => {
         const div = document.createElement('div');
@@ -122,21 +209,21 @@ function actualizarListaUsuarios(usuarios) {
 
         const avatar = document.createElement('div');
         avatar.className = 'usuario-avatar';
-        avatar.textContent = usuario.charAt(0).toUpperCase();
+        avatar.textContent = obtenerIniciales(usuario.nombreCompleto);
 
         const info = document.createElement('div');
         info.className = 'usuario-info';
 
         const nombre = document.createElement('div');
         nombre.className = 'usuario-nombre-sidebar';
-        nombre.textContent = usuario;
+        nombre.textContent = usuario.username;
 
-        const estado = document.createElement('div');
-        estado.className = 'usuario-estado';
-        estado.textContent = 'En línea';
+        const telefono = document.createElement('div');
+        telefono.className = 'usuario-telefono';
+        telefono.textContent = usuario.telefono;
 
         info.appendChild(nombre);
-        info.appendChild(estado);
+        info.appendChild(telefono);
         div.appendChild(avatar);
         div.appendChild(info);
         listaUsuarios.appendChild(div);
@@ -145,7 +232,7 @@ function actualizarListaUsuarios(usuarios) {
 
 // Función: Manejar indicador de escribiendo
 function manejarEscribiendo() {
-    socket.emit('escribiendo', miNombre);
+    socket.emit('escribiendo', misDatos.username);
 
     clearTimeout(escribiendoTimeout);
     escribiendoTimeout = setTimeout(() => {
@@ -153,11 +240,19 @@ function manejarEscribiendo() {
     }, 1000);
 }
 
-// Event listeners
-btnUnirse.addEventListener('click', unirseAlChat);
-nombreInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') unirseAlChat();
+// Función: Formatear username mientras se escribe
+usernameInput.addEventListener('input', (e) => {
+    // Remover caracteres no permitidos
+    e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
 });
+
+// Función: Validar que solo sean números en el teléfono
+telefonoInput.addEventListener('input', (e) => {
+    e.target.value = e.target.value.replace(/[^0-9]/g, '');
+});
+
+// Event listeners
+formRegistro.addEventListener('submit', unirseAlChat);
 
 btnEnviar.addEventListener('click', enviarMensaje);
 mensajeInput.addEventListener('keypress', (e) => {
@@ -168,16 +263,16 @@ mensajeInput.addEventListener('keypress', (e) => {
 mensajeInput.addEventListener('input', manejarEscribiendo);
 
 // Socket.io events
-socket.on('usuario-unido', (nombre) => {
-    mostrarNotificacion(`${nombre} se unió al chat`);
+socket.on('usuario-unido', (usuario) => {
+    mostrarNotificacion(`${usuario.username} se unió al chat`);
 });
 
-socket.on('usuario-desconectado', (nombre) => {
-    mostrarNotificacion(`${nombre} salió del chat`);
+socket.on('usuario-desconectado', (usuario) => {
+    mostrarNotificacion(`${usuario.username} salió del chat`);
 });
 
 socket.on('mensaje', (data) => {
-    const esMio = data.usuario === miNombre;
+    const esMio = data.usuario === misDatos.username;
     mostrarMensaje(data, esMio);
 });
 
@@ -185,11 +280,14 @@ socket.on('lista-usuarios', (usuarios) => {
     actualizarListaUsuarios(usuarios);
 });
 
-socket.on('usuario-escribiendo', (nombre) => {
+socket.on('usuario-escribiendo', (username) => {
     escribiendoIndicador.style.display = 'block';
-    escribiendoIndicador.querySelector('span').textContent = `${nombre} está escribiendo...`;
+    escribiendoIndicador.querySelector('span').textContent = `${username} está escribiendo...`;
 });
 
 socket.on('usuario-dejo-escribir', () => {
     escribiendoIndicador.style.display = 'none';
 });
+
+console.log('%c💬 Whatsapp 2', 'color: #25D366; font-size: 20px; font-weight: bold;');
+console.log('%cChat en tiempo real con Socket.io', 'color: #128C7E; font-size: 14px;');
