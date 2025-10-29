@@ -325,6 +325,7 @@ body {
     display: flex;
     flex-direction: column;
     background: #0B141A;
+    height: 100vh;
 }
 
 .header {
@@ -336,6 +337,7 @@ body {
     align-items: center;
     border-bottom: 1px solid #2A3942;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
 }
 
 .header-info h2 {
@@ -420,6 +422,7 @@ body {
     background-position: center;
     background-attachment: fixed;
     position: relative;
+    min-height: 0;
 }
 
 .mensajes::before {
@@ -445,6 +448,7 @@ body {
     gap: 12px;
     align-items: center;
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
 }
 
 .btn-emoji {
