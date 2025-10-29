@@ -11,7 +11,7 @@
 <!-- Pantalla de inicio -->
 <div id="inicio" class="pantalla-inicio">
     <div class="container-inicio">
-        <h1>💬 Whatsapp 2</h1>
+        <h1>Whatsapp 2</h1>
         <p>Chat en tiempo real</p>
         <input type="text" id="nombre-input" placeholder="Tu nombre" maxlength="20">
         <button id="btn-unirse">Entrar</button>
@@ -20,17 +20,46 @@
 
 <!-- Pantalla de chat -->
 <div id="chat" class="pantalla-chat" style="display: none;">
-    <div class="header">
-        <h2>💬 Whatsapp 2</h2>
-        <span id="usuario-nombre"></span>
-    </div>
 
-    <div id="mensajes" class="mensajes"></div>
+    <!-- Sidebar con usuarios conectados -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h3>👥 Online</h3>
+        </div>
+        <div id="lista-usuarios" class="lista-usuarios">
+            <!-- Usuarios aparecerán aquí -->
+        </div>
+    </aside>
 
-    <div class="input-area">
-        <input type="text" id="mensaje-input" placeholder="Escribe un mensaje...">
-        <button id="btn-enviar">Enviar</button>
-    </div>
+    <!-- Área principal del chat -->
+    <main class="chat-principal">
+        <div class="header">
+            <div class="header-info">
+                <h2>Whatsapp 2</h2>
+                <span class="estado">En línea</span>
+            </div>
+            <div class="header-usuario">
+                <span id="usuario-nombre"></span>
+            </div>
+        </div>
+
+        <div id="mensajes" class="mensajes"></div>
+
+        <!-- Indicador de "escribiendo..." -->
+        <div id="escribiendo-indicador" class="escribiendo-indicador" style="display: none;">
+            <span></span>
+        </div>
+
+        <div class="input-area">
+            <button class="btn-emoji" title="Emojis">😊</button>
+            <input type="text" id="mensaje-input" placeholder="Escribe un mensaje...">
+            <button id="btn-enviar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/>
+                </svg>
+            </button>
+        </div>
+    </main>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>

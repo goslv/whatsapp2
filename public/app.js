@@ -9,8 +9,11 @@ const mensajeInput = document.getElementById('mensaje-input');
 const btnEnviar = document.getElementById('btn-enviar');
 const mensajesDiv = document.getElementById('mensajes');
 const usuarioNombre = document.getElementById('usuario-nombre');
+const listaUsuarios = document.getElementById('lista-usuarios');
+const escribiendoIndicador = document.getElementById('escribiendo-indicador');
 
 let miNombre = '';
+let escribiendoTimeout;
 
 // Función: Unirse al chat
 function unirseAlChat() {
@@ -25,7 +28,7 @@ function unirseAlChat() {
 
     // Cambiar pantallas
     pantallaInicio.style.display = 'none';
-    pantallaChat.style.display = 'flex';
+    pantallaChat.style.display = 'grid';
 
     // Mostrar nombre en header
     usuarioNombre.textContent = nombre;
@@ -55,6 +58,9 @@ function enviarMensaje() {
     // Limpiar input
     mensajeInput.value = '';
     mensajeInput.focus();
+
+    // Detener indicador de escribiendo
+    socket.emit('dejar-escribir');
 }
 
 // Función: Mostrar mensaje
@@ -106,6 +112,47 @@ function obtenerHora() {
     return `${horas}:${minutos}`;
 }
 
+// Función: Actualizar lista de usuarios
+function actualizarListaUsuarios(usuarios) {
+    listaUsuarios.innerHTML = '';
+
+    usuarios.forEach(usuario => {
+        const div = document.createElement('div');
+        div.className = 'usuario-online';
+
+        const avatar = document.createElement('div');
+        avatar.className = 'usuario-avatar';
+        avatar.textContent = usuario.charAt(0).toUpperCase();
+
+        const info = document.createElement('div');
+        info.className = 'usuario-info';
+
+        const nombre = document.createElement('div');
+        nombre.className = 'usuario-nombre-sidebar';
+        nombre.textContent = usuario;
+
+        const estado = document.createElement('div');
+        estado.className = 'usuario-estado';
+        estado.textContent = 'En línea';
+
+        info.appendChild(nombre);
+        info.appendChild(estado);
+        div.appendChild(avatar);
+        div.appendChild(info);
+        listaUsuarios.appendChild(div);
+    });
+}
+
+// Función: Manejar indicador de escribiendo
+function manejarEscribiendo() {
+    socket.emit('escribiendo', miNombre);
+
+    clearTimeout(escribiendoTimeout);
+    escribiendoTimeout = setTimeout(() => {
+        socket.emit('dejar-escribir');
+    }, 1000);
+}
+
 // Event listeners
 btnUnirse.addEventListener('click', unirseAlChat);
 nombreInput.addEventListener('keypress', (e) => {
@@ -116,6 +163,9 @@ btnEnviar.addEventListener('click', enviarMensaje);
 mensajeInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') enviarMensaje();
 });
+
+// Event listener para indicador de escribiendo
+mensajeInput.addEventListener('input', manejarEscribiendo);
 
 // Socket.io events
 socket.on('usuario-unido', (nombre) => {
@@ -129,4 +179,17 @@ socket.on('usuario-desconectado', (nombre) => {
 socket.on('mensaje', (data) => {
     const esMio = data.usuario === miNombre;
     mostrarMensaje(data, esMio);
+});
+
+socket.on('lista-usuarios', (usuarios) => {
+    actualizarListaUsuarios(usuarios);
+});
+
+socket.on('usuario-escribiendo', (nombre) => {
+    escribiendoIndicador.style.display = 'block';
+    escribiendoIndicador.querySelector('span').textContent = `${nombre} está escribiendo...`;
+});
+
+socket.on('usuario-dejo-escribir', () => {
+    escribiendoIndicador.style.display = 'none';
 });

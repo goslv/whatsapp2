@@ -27,6 +27,10 @@ io.on('connection', (socket) => {
     socket.on('unirse', (nombre) => {
         usuarios[socket.id] = nombre;
         socket.broadcast.emit('usuario-unido', nombre);
+
+        // Enviar lista actualizada de usuarios a todos
+        io.emit('lista-usuarios', Object.values(usuarios));
+
         console.log(`${nombre} se unió al chat`);
     });
 
@@ -35,12 +39,26 @@ io.on('connection', (socket) => {
         io.emit('mensaje', data);
     });
 
+    // Usuario escribiendo
+    socket.on('escribiendo', (nombre) => {
+        socket.broadcast.emit('usuario-escribiendo', nombre);
+    });
+
+    // Usuario dejó de escribir
+    socket.on('dejar-escribir', () => {
+        socket.broadcast.emit('usuario-dejo-escribir');
+    });
+
     // Usuario se desconecta
     socket.on('disconnect', () => {
         const nombre = usuarios[socket.id];
         if (nombre) {
             socket.broadcast.emit('usuario-desconectado', nombre);
             delete usuarios[socket.id];
+
+            // Enviar lista actualizada de usuarios a todos
+            io.emit('lista-usuarios', Object.values(usuarios));
+
             console.log(`${nombre} se desconectó`);
         }
     });
@@ -48,8 +66,5 @@ io.on('connection', (socket) => {
 
 // Iniciar servidor
 server.listen(PORT, () => {
-    console.log('╔═══════════════════════════╗');
-    console.log('║   💬 WHATSAPP 2 ONLINE    ║');
-    console.log('╚═══════════════════════════╝');
     console.log(`http://localhost:${PORT}`);
 });
