@@ -282,7 +282,7 @@ socket.on('lista-usuarios', (usuarios) => {
 
 socket.on('usuario-escribiendo', (username) => {
     escribiendoIndicador.style.display = 'block';
-    escribiendoIndicador.querySelector('span').textContent = `${username} está escribiendo...`;
+    escribiendoIndicador.querySelector('.typing-text').textContent = `${username} está escribiendo...`;
 });
 
 socket.on('usuario-dejo-escribir', () => {
